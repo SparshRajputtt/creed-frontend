@@ -15,13 +15,13 @@ export default defineConfig({
     proxy: {
       // Proxy all /uploads requests to your Express server
       "/uploads": {
-        target: "http://localhost:3000",
+        target: "http://localhost:4000",
         changeOrigin: true,
         secure: false,
       },
       // Also proxy your API routes if you have them
       "/api": {
-        target: "http://localhost:3000",
+        target: "http://localhost:4000",
         changeOrigin: true,
         secure: false,
       },

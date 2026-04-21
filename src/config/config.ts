@@ -8,12 +8,12 @@
 // };
 
 export const config = {
-  API_BASE_URL: 'https://creedhomewares.in',
-  api: 'https://creedhomewares.in/api',
+  // API_BASE_URL: 'https://creedhomewares.in',
+  // api: 'https://creedhomewares.in/api',
 
-  // api: 'http://localhost:3000/api',
+  api: 'http://localhost:4000/api',      //changed from 3000 to 4000 
 
-  // API_BASE_URL: 'http://localhost:3000',
+  API_BASE_URL: 'http://localhost:4000', //changed from 3000 to 4000
 
   RAZORPAY_KEY_ID: 'rzp_test_1234567890',
   APP_NAME: 'Creed Store',

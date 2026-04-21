@@ -4,7 +4,7 @@ import { authStorage } from "./storage"
 import { queryClient } from "../queryClient"
 import { config } from "@/config"
 
-const API_BASE_URL = config.api || "http://localhost:3000/api"
+const API_BASE_URL = config.api || "http://localhost:4000/api" // changed from 3000 to 4000
 
 // Create axios instance
 export const api = axios.create({

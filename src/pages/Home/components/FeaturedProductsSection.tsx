@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-nocheck
 import type React from 'react';
 import { Link } from 'react-router-dom';
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Star, Heart, ShoppingCart, Eye } from 'lucide-react';
 import { useFeaturedProducts } from '@/queries/hooks/product/useProducts';
-import { addToCartAtom, useAddToCart } from '@/queries';
+import { addToCartAtom } from '@/queries';
 import { useAtom } from 'jotai';
 
 export const FeaturedProductsSection: React.FC = () => {
@@ -14,6 +15,7 @@ export const FeaturedProductsSection: React.FC = () => {
 
   const [, addToCart] = useAtom(addToCartAtom);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAddToCart = (product: any) => {
     if (!product) return;
 

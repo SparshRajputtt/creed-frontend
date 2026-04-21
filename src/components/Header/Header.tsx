@@ -150,6 +150,7 @@ export const Header: React.FC = () => {
                     <img
                       className=" ml-[5px] md:ml-[0px] h-[76px] w-[76px] "
                       src={Logo}
+                      alt="Updated Logo"
                     />
                   </span>
                   {/* <span className="text-[20px] text-[#2d5040] font-semibold">
