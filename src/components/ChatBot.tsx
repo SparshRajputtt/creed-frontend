@@ -1,4 +1,4 @@
-import { useChat, type ProductCard } from '../queries/hooks/useChat';
+import { useChat } from '../queries/hooks/useChat';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
