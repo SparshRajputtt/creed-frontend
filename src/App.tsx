@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-nocheck
 import type React from 'react';
+import ChatBot from './components/ChatBot.tsx';
 import { useEffect } from 'react';
 import {
   BrowserRouter as Router,
@@ -100,6 +101,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <ChatBot />
     </div>
   );
 };
