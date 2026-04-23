@@ -1,20 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-nocheck
 
-import type React from 'react';
-import { useState } from 'react';
-import { useAtom } from 'jotai';
+import type React from "react";
+import { useState } from "react";
+import { useAtom } from "jotai";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -22,26 +24,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Plus,
   Search,
@@ -53,28 +55,28 @@ import {
   Upload,
   X,
   Loader2,
-} from 'lucide-react';
-import { useCategories } from '@/queries/hooks/category/useCategories';
+} from "lucide-react";
+import { useCategories } from "@/queries/hooks/category/useCategories";
 import {
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
-} from '@/queries/hooks/category/useCategoryMutations';
+} from "@/queries/hooks/category/useCategoryMutations";
 import {
   selectedCategoryAtom,
   categoryFormAtom,
   modalOpenAtom,
   modalTypeAtom,
-} from '../state/adminAtoms';
+} from "../state/adminAtoms";
 
 export const CategoriesManagement: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useAtom(selectedCategoryAtom);
   const [categoryForm, setCategoryForm] = useAtom(categoryFormAtom);
   const [modalOpen, setModalOpen] = useAtom(modalOpenAtom);
   const [modalType, setModalType] = useAtom(modalTypeAtom);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const { data: categories, isLoading } = useCategories();
   const createCategoryMutation = useCreateCategory();
@@ -82,7 +84,7 @@ export const CategoriesManagement: React.FC = () => {
   const deleteCategoryMutation = useDeleteCategory();
 
   // Debug: Log mutation states
-  console.log('Create category mutation state:', {
+  console.log("Create category mutation state:", {
     isPending: createCategoryMutation.isPending,
     isError: createCategoryMutation.isError,
     error: createCategoryMutation.error,
@@ -91,48 +93,49 @@ export const CategoriesManagement: React.FC = () => {
 
   const handleCreateCategory = () => {
     setCategoryForm({
-      name: '',
-      description: '',
-      parent: '',
-      icon: '',
+      name: "",
+      description: "",
+      parent: "",
+      icon: "",
       sortOrder: 0,
       isFeatured: false,
-      seoTitle: '',
-      seoDescription: '',
-      metaKeywords: '',
+      seoTitle: "",
+      seoDescription: "",
+      metaKeywords: "",
     });
     setSelectedCategory(null);
-    setModalType('create');
+    setModalType("create");
     setModalOpen(true);
     setImage(null);
-    setImagePreview('');
+    setImagePreview("");
   };
 
   const handleEditCategory = (category: any) => {
     setCategoryForm({
       name: category.name,
-      description: category.description || '',
-      parent: category.parent?._id || '',
-      icon: category.icon || '',
+      description: category.description || "",
+      parent: category.parent?._id || "",
+      icon: category.icon || "",
       sortOrder: category.sortOrder,
       isFeatured: category.isFeatured,
-      seoTitle: category.seoTitle || '',
-      seoDescription: category.seoDescription || '',
-      metaKeywords: category.metaKeywords?.join(', ') || '',
+      seoTitle: category.seoTitle || "",
+      seoDescription: category.seoDescription || "",
+      metaKeywords: category.metaKeywords?.join(", ") || "",
     });
     setSelectedCategory(category);
-    setModalType('edit');
+    setModalType("edit");
     setModalOpen(true);
     setImage(null);
-    setImagePreview(category.image?.url || '');
+    setImagePreview(category.image?.url || "");
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
+    if (window.confirm("Are you sure you want to delete this category?")) {
       try {
         await deleteCategoryMutation.mutateAsync(categoryId);
       } catch (error) {
         // Error handled by mutation
+        console.error("Error deleting category:", error);
       }
     }
   };
@@ -148,55 +151,59 @@ export const CategoriesManagement: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('Form submitted!'); // Debug log
-    console.log('Category form data:', categoryForm); // Debug log
-    console.log('Modal type:', modalType); // Debug log
-    console.log('Selected image:', image); // Debug log
+    console.log("Form submitted!"); // Debug log
+    console.log("Category form data:", categoryForm); // Debug log
+    console.log("Modal type:", modalType); // Debug log
+    console.log("Selected image:", image); // Debug log
 
     // Validation checks
     if (!categoryForm.name?.trim()) {
-      console.error('Category name is required');
-      alert('Category name is required');
+      console.error("Category name is required");
+      alert("Category name is required");
       return;
     }
 
     try {
-      console.log('Preparing submission data...'); // Debug log
+      console.log("Preparing submission data..."); // Debug log
 
       // Prepare category data object
       const categoryData = { ...categoryForm };
 
+      if (categoryData.attributes && !Array.isArray(categoryData.attributes)) {
+        delete categoryData.attributes;
+      }
+
       // Handle parent category - convert "none" to empty string or null
-      if (categoryData.parent === 'none' || categoryData.parent === '') {
-        categoryData.parent = null;
+      if (categoryData.parent === "none" || categoryData.parent === "") {
+        delete categoryData.parent;
       }
 
       // Remove any undefined, null, or empty string values (except parent which can be null)
       Object.keys(categoryData).forEach((key) => {
         const value = categoryData[key];
         if (
-          key !== 'parent' &&
-          (value === null || value === undefined || value === '')
+          key !== "parent" &&
+          (value === null || value === undefined || value === "")
         ) {
           delete categoryData[key];
         }
       });
 
-      console.log('Cleaned category data:', categoryData); // Debug log
+      console.log("Cleaned category data:", categoryData); // Debug log
 
-      if (modalType === 'create') {
-        console.log('Creating new category...'); // Debug log
+      if (modalType === "create") {
+        console.log("Creating new category..."); // Debug log
 
         const mutationData = {
           categoryData: categoryData,
           image: image || undefined,
         };
 
-        console.log('Create mutation data:', mutationData); // Debug log
+        console.log("Create mutation data:", mutationData); // Debug log
         const result = await createCategoryMutation.mutateAsync(mutationData);
-        console.log('Create result:', result); // Debug log
+        console.log("Create result:", result); // Debug log
       } else if (selectedCategory) {
-        console.log('Updating existing category:', selectedCategory._id); // Debug log
+        console.log("Updating existing category:", selectedCategory._id); // Debug log
 
         const mutationData = {
           id: selectedCategory._id,
@@ -204,15 +211,15 @@ export const CategoriesManagement: React.FC = () => {
           image: image || undefined,
         };
 
-        console.log('Update mutation data:', mutationData); // Debug log
+        console.log("Update mutation data:", mutationData); // Debug log
         const result = await updateCategoryMutation.mutateAsync(mutationData);
-        console.log('Update result:', result); // Debug log
+        console.log("Update result:", result); // Debug log
       }
 
-      console.log('Operation successful, closing modal...'); // Debug log
+      console.log("Operation successful, closing modal..."); // Debug log
       setModalOpen(false);
     } catch (error) {
-      console.error('Error in handleSubmit:', error); // Debug log
+      console.error("Error in handleSubmit:", error); // Debug log
 
       // Show user-friendly error message
       if (error?.response?.data?.message) {
@@ -220,13 +227,13 @@ export const CategoriesManagement: React.FC = () => {
       } else if (error?.message) {
         alert(`Error: ${error.message}`);
       } else {
-        alert('An unexpected error occurred. Please try again.');
+        alert("An unexpected error occurred. Please try again.");
       }
     }
   };
 
   const filteredCategories = categories?.filter((category) =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    category.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const isLoading_mutation =
@@ -355,7 +362,7 @@ export const CategoriesManagement: React.FC = () => {
                       <div className="flex items-center space-x-3">
                         {category.image?.url ? (
                           <img
-                            src={category.image.url || '/placeholder.svg'}
+                            src={category.image.url || "/placeholder.svg"}
                             alt={category.name}
                             className="w-10 h-10 rounded-lg object-cover"
                           />
@@ -387,11 +394,11 @@ export const CategoriesManagement: React.FC = () => {
                         <Badge
                           className={
                             category.isActive
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
                           }
                         >
-                          {category.isActive ? 'Active' : 'Inactive'}
+                          {category.isActive ? "Active" : "Inactive"}
                         </Badge>
                         {category.isFeatured && (
                           <Badge className="bg-blue-100 text-blue-800">
@@ -440,7 +447,7 @@ export const CategoriesManagement: React.FC = () => {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {modalType === 'create' ? 'Create New Category' : 'Edit Category'}
+              {modalType === "create" ? "Create New Category" : "Edit Category"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -449,7 +456,7 @@ export const CategoriesManagement: React.FC = () => {
                 <Label htmlFor="name">Category Name *</Label>
                 <Input
                   id="name"
-                  value={categoryForm.name || ''}
+                  value={categoryForm.name || ""}
                   onChange={(e) =>
                     setCategoryForm({ ...categoryForm, name: e.target.value })
                   }
@@ -459,7 +466,7 @@ export const CategoriesManagement: React.FC = () => {
               <div className="space-y-2">
                 <Label htmlFor="parent">Parent Category</Label>
                 <Select
-                  value={categoryForm.parent || 'none'}
+                  value={categoryForm.parent || "none"}
                   onValueChange={(value) =>
                     setCategoryForm({ ...categoryForm, parent: value })
                   }
@@ -485,7 +492,7 @@ export const CategoriesManagement: React.FC = () => {
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
-                value={categoryForm.description || ''}
+                value={categoryForm.description || ""}
                 onChange={(e) =>
                   setCategoryForm({
                     ...categoryForm,
@@ -519,7 +526,7 @@ export const CategoriesManagement: React.FC = () => {
               {imagePreview && (
                 <div className="relative inline-block">
                   <img
-                    src={imagePreview || '/placeholder.svg'}
+                    src={imagePreview || "/placeholder.svg"}
                     alt="Preview"
                     className="w-24 h-24 object-cover rounded"
                   />
@@ -530,7 +537,7 @@ export const CategoriesManagement: React.FC = () => {
                     className="absolute -top-2 -right-2 h-6 w-6"
                     onClick={() => {
                       setImage(null);
-                      setImagePreview('');
+                      setImagePreview("");
                     }}
                   >
                     <X className="h-3 w-3" />
@@ -544,7 +551,7 @@ export const CategoriesManagement: React.FC = () => {
                 <Label htmlFor="icon">Icon Class</Label>
                 <Input
                   id="icon"
-                  value={categoryForm.icon || ''}
+                  value={categoryForm.icon || ""}
                   onChange={(e) =>
                     setCategoryForm({ ...categoryForm, icon: e.target.value })
                   }
@@ -573,7 +580,7 @@ export const CategoriesManagement: React.FC = () => {
                 <Label htmlFor="seoTitle">SEO Title</Label>
                 <Input
                   id="seoTitle"
-                  value={categoryForm.seoTitle || ''}
+                  value={categoryForm.seoTitle || ""}
                   onChange={(e) =>
                     setCategoryForm({
                       ...categoryForm,
@@ -586,7 +593,7 @@ export const CategoriesManagement: React.FC = () => {
                 <Label htmlFor="seoDescription">SEO Description</Label>
                 <Textarea
                   id="seoDescription"
-                  value={categoryForm.seoDescription || ''}
+                  value={categoryForm.seoDescription || ""}
                   onChange={(e) =>
                     setCategoryForm({
                       ...categoryForm,
@@ -600,7 +607,7 @@ export const CategoriesManagement: React.FC = () => {
                 <Label htmlFor="metaKeywords">Meta Keywords</Label>
                 <Input
                   id="metaKeywords"
-                  value={categoryForm.metaKeywords || ''}
+                  value={categoryForm.metaKeywords || ""}
                   onChange={(e) =>
                     setCategoryForm({
                       ...categoryForm,
@@ -641,13 +648,13 @@ export const CategoriesManagement: React.FC = () => {
                 {isLoading_mutation ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {modalType === 'create' ? 'Creating...' : 'Updating...'}
+                    {modalType === "create" ? "Creating..." : "Updating..."}
                   </>
                 ) : (
                   <>
-                    {modalType === 'create'
-                      ? 'Create Category'
-                      : 'Update Category'}
+                    {modalType === "create"
+                      ? "Create Category"
+                      : "Update Category"}
                   </>
                 )}
               </Button>
