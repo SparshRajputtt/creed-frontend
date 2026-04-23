@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 import { toast } from "react-hot-toast";
 import { apiClient } from "../../utils/api";
+import { authStorage } from "../../utils/storage";
 import { queryKeys } from "../../utils/queryKeys";
 import {
   userAtom,
@@ -159,7 +160,7 @@ export const useCurrentUser = () => {
   return useQuery<AuthResponse["user"], Error>({
     queryKey: ["currentUser"],
     queryFn: async () => {
-      const token = localStorage.getItem("token");
+      const token = authStorage.getAccessToken();
       if (!token) {
         throw new Error("No token found");
       }
@@ -168,7 +169,7 @@ export const useCurrentUser = () => {
 
       //   return API(config.api, '/auth/me', 'GET', token);
     },
-    enabled: !!localStorage.getItem("token"),
+    enabled: !!authStorage.getAccessToken(),
     retry: false,
   });
 };
