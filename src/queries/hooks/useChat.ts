@@ -1,16 +1,29 @@
+import { useState, useRef } from 'react';
+import { useAtomValue } from 'jotai';
 import { userAtom, isAuthenticatedAtom } from '../store/auth';
 import { api } from '../utils/api';
-import { useState, useEffect, useRef } from 'react';
-import { useAtomValue } from 'jotai';
-
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  products?: ProductCard[];
+}
+
+export interface ProductCard {
+  _id: string;
+  name: string;
+  price: number;
+  comparePrice?: number;
+  slug: string;
+  images?: { url: string; alt: string }[];
+  ratings?: { average: number; count: number };
+  stock: number;
+  category?: { name: string };
+  isFeatured?: boolean;
 }
 
 interface ChatContext {
-  products: unknown[];
+  products: ProductCard[];
   categories: unknown[];
   coupons: unknown[];
 }
@@ -25,9 +38,8 @@ export const useChat = () => {
   const user = useAtomValue(userAtom);
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
 
-  // Fetch context once when hook mounts (or when chat opens)
   const loadContext = async () => {
-    if (contextRef.current) return; // already loaded
+    if (contextRef.current) return;
     setIsContextLoading(true);
     try {
       const { data } = await api.get('/chat/context');
@@ -51,28 +63,28 @@ export const useChat = () => {
 
     try {
       const payload: Record<string, unknown> = {
-        messages: updatedMessages,
+        // Only send role+content to AI, not products
+        messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
         context: contextRef.current,
       };
 
-      // Send userId if logged in so chatbot can fetch their orders
       if (isAuthenticated && user?.id) {
         payload.userId = user.id;
       }
 
       const { data } = await api.post('/chat', payload);
 
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: data.reply },
-      ]);
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.reply,
+        products: data.products || [],
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error('Chat error:', err);
-      const errorMsg = err?.response?.data?.error || 'Sorry, I ran into an issue. Please try again!';
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: errorMsg },
-      ]);
+      const msg = err?.response?.data?.error || 'Sorry, I ran into an issue. Please try again!';
+      setMessages(prev => [...prev, { role: 'assistant', content: msg, products: [] }]);
     } finally {
       setIsLoading(false);
     }
