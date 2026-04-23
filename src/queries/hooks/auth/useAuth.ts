@@ -54,6 +54,7 @@ export const useLogin = () => {
       login({
         user: response.user,
         token: response.token,
+        refreshToken: response.refreshToken,
       });
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user });
@@ -77,6 +78,7 @@ export const useRegister = () => {
       login({
         user: response.user,
         token: response.token,
+        refreshToken: response.refreshToken,
       });
       toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user });
