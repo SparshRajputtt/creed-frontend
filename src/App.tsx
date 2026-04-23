@@ -3,6 +3,7 @@
 import type React from 'react';
 import ChatBot from './components/ChatBot.tsx';
 import { useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import {
   BrowserRouter as Router,
   Routes,
@@ -302,6 +303,7 @@ const App: React.FC = () => {
   return (
     <QueryProvider>
       <AuthProvider>
+        <Toaster position="top-right" />
         <AppContent />
       </AuthProvider>
     </QueryProvider>
