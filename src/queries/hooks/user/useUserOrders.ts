@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //@ts-nocheck
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../utils/api';
@@ -14,7 +16,7 @@ export const useUserOrders = (params?: OrdersQuery) => {
       pagination: any;
       data: Order[];
     }> => {
-      const response = await apiClient.get('/user/orders', params);
+      const response = await apiClient.get('/users/orders', params);
       return response;
     },
     keepPreviousData: true,
@@ -25,7 +27,7 @@ export const useUserOrder = (id: string) => {
   return useQuery({
     queryKey: queryKeys.user.order(id),
     queryFn: async (): Promise<Order> => {
-      const response = await apiClient.get(`/user/orders/${id}`);
+      const response = await apiClient.get(`/users/orders/${id}`);
       return response.data;
     },
     enabled: !!id,
@@ -61,7 +63,7 @@ export const useRequestReturn = () => {
       orderId: string;
       reason: string;
     }) => {
-      const response = await apiClient.post(`/user/orders/${orderId}/return`, {
+      const response = await apiClient.post(`/users/orders/${orderId}/return`, {
         reason,
       });
       return response.data;

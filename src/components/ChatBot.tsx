@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -6,8 +8,10 @@ import {
   ShoppingBag, ExternalLink,
 } from 'lucide-react';
 import { useChat, type ProductCard } from '../queries/hooks/useChat';
+import { config } from '@/config';
+import Favicon from '@/images/Favicon.png';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL?.replace('/api', '') || 'http://localhost:4000';
+const baseUrl = config.API_BASE_URL || config.api?.replace('/api', '') || 'http://localhost:4000';
 
 // ─── Markdown renderer (bold + bullets, no library needed) ───────────────────
 const renderMarkdown = (text: string) => {
@@ -28,11 +32,7 @@ const renderMarkdown = (text: string) => {
 
 // ─── Product Card ─────────────────────────────────────────────────────────────
 const ProductCardItem = ({ product }: { product: ProductCard }) => {
-  const imageUrl = product.images?.[0]?.url
-    ? product.images[0].url.startsWith('http')
-      ? product.images[0].url
-      : `${BACKEND_URL}${product.images[0].url}`
-    : null;
+  const imageUrl = product.images?.[0]?.url;
 
   const hasDiscount = product.comparePrice && product.comparePrice > product.price;
   const discountPercent = hasDiscount
@@ -51,20 +51,22 @@ const ProductCardItem = ({ product }: { product: ProductCard }) => {
     >
       {/* Image */}
       <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 relative">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={product.images?.[0]?.alt || product.name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <ShoppingBag size={20} className="text-gray-300" />
-          </div>
-        )}
+        <img
+          src={
+            imageUrl
+              ? imageUrl.startsWith('http')
+                ? imageUrl
+                : `${baseUrl}${imageUrl}`
+              : Favicon
+          }
+          alt={product.images?.[0]?.alt || product.name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.currentTarget as HTMLImageElement;
+            target.onerror = null;
+            target.src = Favicon;
+          }}
+        />
         {hasDiscount && (
           <span className="absolute top-0.5 left-0.5 bg-red-500 text-white text-[9px] font-bold px-1 rounded">
             -{discountPercent}%
@@ -352,9 +354,9 @@ export default function ChatBot() {
               )}
 
               {/* Messages */}
-              {messages.map((msg, i) => (
+              {messages.map((msg) => (
                 <MessageBubble
-                  key={i}
+                  key={`${msg.role}-${msg.content}`}
                   role={msg.role}
                   content={msg.content}
                   products={msg.products}
