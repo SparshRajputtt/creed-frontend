@@ -1,21 +1,32 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-nocheck
 import type React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Star, Heart, ShoppingCart, Eye } from 'lucide-react';
 import { useFeaturedProducts } from '@/queries/hooks/product/useProducts';
-import { addToCartAtom } from '@/queries';
+import {
+  useWishlist,
+  useAddToWishlist,
+  useRemoveFromWishlist,
+} from '@/queries/hooks/user';
+import { addToCartAtom, useAuth } from '@/queries';
 import { useAtom } from 'jotai';
+import { toast } from 'sonner';
 
 export const FeaturedProductsSection: React.FC = () => {
+  const navigate = useNavigate();
   const { data: featuredProducts, isLoading } = useFeaturedProducts(8);
+  const { data: wishlistData, isLoading: wishlistLoading } = useWishlist();
+  const { isAuthenticated } = useAuth();
+  const addToWishlistMutation = useAddToWishlist();
+  const removeFromWishlistMutation = useRemoveFromWishlist();
 
   const [, addToCart] = useAtom(addToCartAtom);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAddToCart = (product: any) => {
     if (!product) return;
 
@@ -48,6 +59,56 @@ export const FeaturedProductsSection: React.FC = () => {
 
     addToCart(cartItem);
     toast.success('Added to cart!');
+  };
+
+  const handleWishlistToggle = async (productId: string, isInWishlist: boolean, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error('Please login to add items to wishlist');
+      navigate('/login');
+      return;
+    }
+
+    if (!productId) {
+      toast.error('Product information is missing');
+      return;
+    }
+
+    if (
+      addToWishlistMutation.isLoading ||
+      removeFromWishlistMutation.isLoading
+    ) {
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        await removeFromWishlistMutation.mutateAsync(productId);
+      } else {
+        await addToWishlistMutation.mutateAsync(productId);
+      }
+    } catch (error) {
+      console.error('Wishlist error:', error);
+    }
+  };
+
+  const getIsInWishlist = (productId: string) => {
+    if (!wishlistData || !Array.isArray(wishlistData) || !productId) {
+      return false;
+    }
+
+    return wishlistData.some((item) => {
+      const itemProductId =
+        item?.product?._id ||
+        item?.productId ||
+        item?._id ||
+        item?.product?.id ||
+        item?.id;
+
+      return String(itemProductId) === String(productId);
+    });
   };
 
   if (isLoading) {
@@ -111,7 +172,9 @@ export const FeaturedProductsSection: React.FC = () => {
 
         {featuredProducts && (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-6">
-            {featuredProducts.slice(0, 8).map((product) => (
+            {featuredProducts.slice(0, 8).map((product) => {
+              const isInWishlist = getIsInWishlist(product?._id);
+              return (
               <Card
                 key={product?._id}
                 className="group hover:shadow-lg lg:hover:shadow-xl transition-all duration-300 border hover:border-primary/20 h-full flex flex-col overflow-hidden"
@@ -162,11 +225,23 @@ export const FeaturedProductsSection: React.FC = () => {
                     {/* Action Buttons */}
                     <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <Button
+                        onClick={(e) => handleWishlistToggle(product?._id, isInWishlist, e)}
                         size="icon"
                         variant="secondary"
-                        className="h-7 w-7 lg:h-8 lg:w-8 bg-white/90 backdrop-blur-sm hover:bg-white"
+                        disabled={
+                          wishlistLoading ||
+                          addToWishlistMutation.isLoading ||
+                          removeFromWishlistMutation.isLoading
+                        }
+                        className={`h-7 w-7 lg:h-8 lg:w-8 bg-white/90 backdrop-blur-sm hover:bg-white transition-colors ${
+                          isInWishlist ? 'text-red-500' : 'text-gray-600'
+                        }`}
                       >
-                        <Heart className="h-3 w-3 lg:h-4 lg:w-4" />
+                        <Heart
+                          className={`h-3 w-3 lg:h-4 lg:w-4 ${
+                            isInWishlist ? 'fill-current' : ''
+                          }`}
+                        />
                       </Button>
                       <Button
                         size="icon"
@@ -286,7 +361,8 @@ export const FeaturedProductsSection: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

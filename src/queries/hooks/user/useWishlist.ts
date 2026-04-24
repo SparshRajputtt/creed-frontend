@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //@ts-nocheck
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -9,7 +11,7 @@ export const useWishlist = () => {
   return useQuery({
     queryKey: queryKeys.user.wishlist(),
     queryFn: async () => {
-      const response = await api.get('/user/wishlist');
+      const response = await api.get('/users/wishlist');
       // Return the actual wishlist array, not the entire response object
       return response.data.data; // This gets the wishlist array
     },
@@ -23,7 +25,7 @@ export const useAddToWishlist = () => {
 
   return useMutation({
     mutationFn: async (productId: string) => {
-      const response = await api.post(`/user/wishlist/${productId}`);
+      const response = await api.post(`/users/wishlist/${productId}`);
       return response.data;
     },
     onSuccess: () => {
@@ -42,7 +44,7 @@ export const useRemoveFromWishlist = () => {
 
   return useMutation({
     mutationFn: async (productId: string) => {
-      const response = await api.delete(`/user/wishlist/${productId}`);
+      const response = await api.delete(`/users/wishlist/${productId}`);
       return response.data;
     },
     onSuccess: () => {
@@ -70,10 +72,10 @@ export const useToggleWishlist = () => {
       isInWishlist: boolean;
     }) => {
       if (isInWishlist) {
-        const response = await api.delete(`/user/wishlist/${productId}`);
+        const response = await api.delete(`/users/wishlist/${productId}`);
         return { ...response.data, action: 'removed' };
       } else {
-        const response = await api.post('/user/wishlist', { productId });
+        const response = await api.post(`/users/wishlist/${productId}`);
         return { ...response.data, action: 'added' };
       }
     },
