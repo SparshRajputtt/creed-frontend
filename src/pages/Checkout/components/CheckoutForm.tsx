@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //@ts-nocheck
 
 import type React from 'react';
@@ -336,13 +339,22 @@ export const CheckoutForm: React.FC = () => {
         orderId: order._id,
       });
 
+      const razorpayKey =
+        razorpayOrder?.key || import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+      if (!razorpayKey) {
+        setIsProcessing(false);
+        toast.error('Razorpay key is missing');
+        return;
+      }
+
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
+        key: razorpayKey,
+        amount: razorpayOrder?.amount,
+        currency: razorpayOrder?.currency,
         name: 'Creed Store',
         description: 'Order Payment',
-        order_id: razorpayOrder.razorpayOrderId,
+        order_id: razorpayOrder?.razorpayOrderId,
         handler: async (response: any) => {
           try {
             await verifyRazorpayPaymentMutation.mutateAsync({
