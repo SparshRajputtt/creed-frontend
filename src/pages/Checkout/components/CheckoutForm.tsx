@@ -45,6 +45,7 @@ import {
   useCreateRazorpayOrder,
   useVerifyRazorpayPayment,
   useProcessCODOrder,
+  useHandlePaymentFailure,
 } from '@/queries/hooks/payment/usePayment';
 import { useValidateCoupon } from '@/queries/hooks/coupon';
 import { toast } from 'sonner';
@@ -88,6 +89,7 @@ export const CheckoutForm: React.FC = () => {
   const createRazorpayOrderMutation = useCreateRazorpayOrder();
   const verifyRazorpayPaymentMutation = useVerifyRazorpayPayment();
   const processCODOrderMutation = useProcessCODOrder();
+  const handlePaymentFailureMutation = useHandlePaymentFailure();
   const validateCouponMutation = useValidateCoupon();
 
   const [formData, setFormData] = useState<CheckoutFormData>({
@@ -371,6 +373,15 @@ export const CheckoutForm: React.FC = () => {
           } catch (error) {
             console.error('Verification Error:', error);
             toast.error('Payment verification failed');
+            // Call payment failure endpoint
+            try {
+              await handlePaymentFailureMutation.mutateAsync({
+                orderId: order._id,
+                error: { description: 'Payment verification failed' },
+              });
+            } catch (failureError) {
+              console.error('Error recording payment failure:', failureError);
+            }
           }
         },
         prefill: {
@@ -384,6 +395,8 @@ export const CheckoutForm: React.FC = () => {
         modal: {
           ondismiss: () => {
             setIsProcessing(false);
+            // Note: Payment failure is only reported if verification actually fails,
+            // not when modal is simply dismissed without payment attempt
           },
         },
       };
