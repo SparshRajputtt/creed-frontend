@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 //@ts-nocheck
 
 import type React from 'react';
@@ -64,6 +67,26 @@ export const CategoryProducts: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const addToWishlistMutation = useAddToWishlist();
   const removeFromWishlistMutation = useRemoveFromWishlist();
+
+  const isProductInWishlist = (product) => {
+    const currentProductId = product?._id || product?.id;
+
+    if (!wishlistData || !Array.isArray(wishlistData) || !currentProductId) {
+      return false;
+    }
+
+    return wishlistData.some((item) => {
+      const itemProductId =
+        item?.product?._id ||
+        item?.productId ||
+        item?._id ||
+        item?.product?.id ||
+        item?.id;
+
+      return String(itemProductId) === String(currentProductId);
+    });
+  };
+
   const handleWishlistToggle = async (product) => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -72,13 +95,7 @@ export const CategoryProducts: React.FC = () => {
 
     if (!product) return;
 
-    const isInWishlist = wishlistData?.some((item) => {
-      // Handle different possible structures
-      const itemProductId = item?.product?._id || item?.productId || item?._id;
-      const currentProductId = product?._id || product?.id;
-
-      return String(itemProductId) === String(currentProductId);
-    });
+    const isInWishlist = isProductInWishlist(product);
 
     try {
       if (isInWishlist) {
@@ -554,9 +571,19 @@ export const CategoryProducts: React.FC = () => {
                             onClick={() => handleWishlistToggle(product)}
                             size="sm"
                             variant="secondary"
-                            className="h-8 w-8 p-0 text-red-500 border-red-200 hover:bg-red-50"
+                            className={`h-8 w-8 p-0 border-red-200 hover:bg-red-50 ${
+                              isProductInWishlist(product)
+                                ? 'text-red-500'
+                                : 'text-gray-600'
+                            }`}
                           >
-                            <Heart className="h-4 w-4 fill-current" />
+                            <Heart
+                              className={`h-4 w-4 ${
+                                isProductInWishlist(product)
+                                  ? 'fill-current'
+                                  : ''
+                              }`}
+                            />
                           </Button>
                         </div>
 
@@ -729,9 +756,19 @@ export const CategoryProducts: React.FC = () => {
                                   onClick={() => handleWishlistToggle(product)}
                                   size="sm"
                                   variant="outline"
-                                  className="h-8 w-8 p-0 bg-transparent"
+                                  className={`h-8 w-8 p-0 bg-transparent ${
+                                    isProductInWishlist(product)
+                                      ? 'text-red-500'
+                                      : 'text-gray-600'
+                                  }`}
                                 >
-                                  <Heart className="h-4 w-4" />
+                                  <Heart
+                                    className={`h-4 w-4 ${
+                                      isProductInWishlist(product)
+                                        ? 'fill-current'
+                                        : ''
+                                    }`}
+                                  />
                                 </Button>
                                 <Button
                                   onClick={() => handleAddToCart(product)}
