@@ -36,7 +36,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useUserOrders } from '@/queries/hooks/user/useUserOrders';
+import {
+  useCancelOrder,
+  useUserOrders,
+} from '@/queries/hooks/user/useUserOrders';
 
 const statusConfig = {
   pending: {
@@ -152,6 +155,7 @@ const OrderTimeline = ({ steps, currentStatus }: any) => {
 
 const OrderCard = ({ order, index }: any) => {
   const [expanded, setExpanded] = useState(false);
+  const cancelOrderMutation = useCancelOrder();
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -194,6 +198,12 @@ const OrderCard = ({ order, index }: any) => {
       completed: order.status === 'delivered',
     },
   ];
+
+  const handleCancelOrder = () => {
+    if (window.confirm('Are you sure you want to cancel this order?')) {
+      cancelOrderMutation.mutate(order._id);
+    }
+  };
 
   return (
     <motion.div
@@ -400,7 +410,11 @@ const OrderCard = ({ order, index }: any) => {
 
                     {['pending', 'confirmed'].includes(order.status) &&
                       order.payment.status !== 'confirmed' && (
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={handleCancelOrder}
+                          disabled={cancelOrderMutation.isPending}
+                        >
                           Cancel Order
                         </DropdownMenuItem>
                       )}

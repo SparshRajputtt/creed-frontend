@@ -42,8 +42,10 @@ export const useCancelOrder = () => {
       const response = await apiClient.put(`/orders/${orderId}/cancel`);
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user.orders() });
+    onSuccess: (data, orderId) => {
+      // Invalidate both orders list and specific order detail
+      queryClient.invalidateQueries({ queryKey: ['user', 'orders'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.order(orderId) });
       toast.success('Order cancelled successfully');
     },
     onError: (error: any) => {
@@ -68,8 +70,10 @@ export const useRequestReturn = () => {
       });
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user.orders() });
+    onSuccess: (data, variables) => {
+      // Invalidate both orders list and specific order detail
+      queryClient.invalidateQueries({ queryKey: ['user', 'orders'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.order(variables.orderId) });
       toast.success('Return request submitted successfully');
     },
     onError: (error: any) => {
