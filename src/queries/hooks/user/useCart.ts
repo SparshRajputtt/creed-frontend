@@ -15,7 +15,7 @@ export const useCart = () => {
   return useQuery({
     queryKey: queryKeys.user.cart,
     queryFn: (): Promise<{ success: boolean; data: Cart }> =>
-      apiClient.get('/user/cart'),
+      apiClient.get('/users/cart'),
     select: (data) => data.data,
   });
 };
@@ -28,7 +28,7 @@ export const useAddToCart = () => {
     mutationFn: (
       data: AddToCartRequest
     ): Promise<{ success: boolean; message: string; data: any }> =>
-      apiClient.post('/user/cart', data),
+      apiClient.post('/users/cart', data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.cart });
       toast.success(response.message);
@@ -61,7 +61,7 @@ export const useUpdateCartItem = () => {
       success: boolean;
       message: string;
       data: any;
-    }> => apiClient.put(`/user/cart/${itemId}`, data),
+    }> => apiClient.put(`/users/cart/${itemId}`, data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.cart });
       toast.success(response.message);
@@ -76,7 +76,7 @@ export const useRemoveFromCart = () => {
     mutationFn: (
       itemId: string
     ): Promise<{ success: boolean; message: string }> =>
-      apiClient.delete(`/user/cart/${itemId}`),
+      apiClient.delete(`/users/cart/${itemId}`),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.cart });
       toast.success(response.message);
@@ -90,7 +90,7 @@ export const useClearCart = () => {
 
   return useMutation({
     mutationFn: (): Promise<{ success: boolean; message: string }> =>
-      apiClient.delete('/user/cart'),
+      apiClient.delete('/users/cart'),
     onSuccess: (response) => {
       clearCartLocal();
       queryClient.invalidateQueries({ queryKey: queryKeys.user.cart });

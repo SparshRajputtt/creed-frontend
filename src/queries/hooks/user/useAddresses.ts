@@ -8,7 +8,7 @@ export const useAddresses = () => {
   return useQuery({
     queryKey: queryKeys.user.addresses(),
     queryFn: async () => {
-      const response = await apiClient.get('/user/addresses');
+      const response = await apiClient.get('/users/addresses');
       return response.data;
     },
   });
@@ -19,7 +19,7 @@ export const useCreateAddress = () => {
 
   return useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiClient.post('/user/addresses', data);
+      const response = await apiClient.post('/users/addresses', data);
       return response.data;
     },
     onSuccess: () => {
@@ -37,7 +37,7 @@ export const useUpdateAddress = () => {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const response = await apiClient.put(`/user/addresses/${id}`, data);
+      const response = await apiClient.put(`/users/addresses/${id}`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -55,7 +55,7 @@ export const useDeleteAddress = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await apiClient.delete(`/user/addresses/${id}`);
+      const response = await apiClient.delete(`/users/addresses/${id}`);
       return response.data;
     },
     onSuccess: () => {

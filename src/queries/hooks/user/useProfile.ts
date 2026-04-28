@@ -8,7 +8,7 @@ export const useProfile = () => {
   return useQuery({
     queryKey: queryKeys.user.profile(),
     queryFn: async () => {
-      const response = await apiClient.get('/user/profile');
+      const response = await apiClient.get('/users/profile');
       return response.data;
     },
   });
@@ -23,7 +23,7 @@ export const useUpdateProfile = () => {
       lastName: string;
       phone?: string;
     }) => {
-      const response = await apiClient.put('/user/profile', data);
+      const response = await apiClient.put('/users/profile', data);
       return response.data;
     },
     onSuccess: () => {
@@ -43,7 +43,7 @@ export const useUploadAvatar = () => {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('avatar', file);
-      const response = await apiClient.post('/user/avatar', formData, {
+      const response = await apiClient.post('/users/avatar', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
